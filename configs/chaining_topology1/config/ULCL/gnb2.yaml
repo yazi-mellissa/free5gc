@@ -8,8 +8,8 @@ configuration:
   name: gnb2.free5gc.org
   
   # PLMN identity
-  mcc: 208
-  mnc: 93
+  mcc: ${MCC}  
+  mnc: ${MNC}
   
   # Core network connectivity
   amf:

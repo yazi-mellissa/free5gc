@@ -7,10 +7,8 @@ configuration:
   gnbId: 1
   name: gnb1.free5gc.org
   
-  # PLMN identity
-  mcc: 208
-  mnc: 93
-  
+  mcc: ${MCC}  
+  mnc: ${MNC}
   # Core network connectivity
   amf:
     addr: amf.free5gc.org

@@ -80,8 +80,8 @@ configuration:
       mpsi: 0 # MPS indicator (uinteger, range: 0~1)
       emcN3: 0 # Emergency service support indicator for Non-3GPP access (uinteger, range: 0~1)
       mcsi: 0 # MCS indicator (uinteger, range: 0~1)
-  t3502: 720 # timer value (seconds) at UE side
-  t3512: 3600 # timer value (seconds) at UE side
+  t3502Value: 720 # timer value (seconds) at UE side
+  t3512Value: 3600 # timer value (seconds) at UE side
   non3gppDeregTimerValue: 3240 # timer value (seconds) at UE side
   # retransmission timer for paging message
   t3513:
@@ -114,10 +114,10 @@ configuration:
     expireTime: 2s # default is 6 seconds
     maxRetryTimes: 2 # the max number of retransmission
   # retransmission timer for NAS Identity Request message
-  #t3570:
-    #enable: true # true or false
-    #expireTime: 6s # default is 6 seconds
-    #maxRetryTimes: 4 # the max number of retransmission
+  t3570:
+    enable: true # true or false
+    expireTime: 2s # default is 6 seconds
+    maxRetryTimes: 2 # the max number of retransmission
   locality: area1 # Name of the location where a set of AMF, SMF, PCF and UPFs are located
   sctp: # set the sctp server setting <optinal>, once this field is set, please also add maxInputStream, maxOsStream, maxAttempts, maxInitTimeOut
     numOstreams: 3 # the maximum out streams of each sctp connection

@@ -3,11 +3,15 @@ services:
   mongodb:
     image: mongo:4.4
     container_name: mongodb
+    hostname: mongodb
     networks:
       control_network:
-        ipv4_address: 10.100.200.1
+        ipv4_address: 10.100.200.2
+        aliases:
+          - db
+          - mongodb.free5gc.org
     volumes:
-      - ./mongodb:/data/db
+        - dbdata:/data/db
     healthcheck:
       test: ["CMD", "mongo", "--eval", "db.stats().ok"]
       interval: 10s
@@ -18,35 +22,43 @@ services:
     image: free5gc/nrf:v4.0.0
     command: ./nrf -c ./config/nrfcfg.yaml
     container_name: nrf
+    hostname: nrf.free5gc.org
     networks:
       control_network:
         ipv4_address: 10.100.200.10
+        aliases:
+          - nrf.free5gc.org
     depends_on:
       mongodb:
-        condition: service_healthy
+        condition: service_started
     volumes:
       - ./config/nrfcfg.yaml:/free5gc/config/nrfcfg.yaml
-    healthcheck:
-      test: ["CMD", "wget", "-O", "-", "http://127.0.0.1:8000/status"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - ./cert:/free5gc/cert
+    extra_hosts:
+      - "nrf.free5gc.org:10.100.200.10"
 
   amf:
     image: free5gc/amf:latest
     command: ./amf -c ./config/amfcfg.yaml
     container_name: amf
+    hostname: amf.free5gc.org
     networks:
       control_network:
         ipv4_address: 10.100.200.11
+        aliases:
+          - amf.free5gc.org
     depends_on:
       nrf:
-        condition: service_healthy
+        condition: service_started
     volumes:
       - ./config/amfcfg.yaml:/free5gc/config/amfcfg.yaml
+      - ./cert:/free5gc/cert
+    extra_hosts:
+      - "amf.free5gc.org:10.100.200.11"
   
   ausf:
     container_name: ausf
+    hostname: ausf.free5gc.org
     image: free5gc/ausf:v4.0.0
     command: ./ausf -c ./config/ausfcfg.yaml
     expose:
@@ -62,10 +74,13 @@ services:
           - ausf.free5gc.org
     depends_on:
       nrf:
-        condition: service_healthy
+        condition: service_started
+    extra_hosts:
+      - "ausf.free5gc.org:10.100.200.12"
 
   nssf:
     container_name: nssf
+    hostname: nssf.free5gc.org
     image: free5gc/nssf:v4.0.0
     command: ./nssf -c ./config/nssfcfg.yaml
     expose:
@@ -81,10 +96,13 @@ services:
           - nssf.free5gc.org
     depends_on:
       nrf:
-        condition: service_healthy
+        condition: service_started
+    extra_hosts:
+      - "nssf.free5gc.org:10.100.200.13"
 
   pcf:
     container_name: pcf
+    hostname: pcf.free5gc.org
     image: free5gc/pcf:v4.0.0
     command: ./pcf -c ./config/pcfcfg.yaml
     expose:
@@ -100,26 +118,36 @@ services:
           - pcf.free5gc.org
     depends_on:
       nrf:
-        condition: service_healthy
+        condition: service_started
+    extra_hosts:
+      - "pcf.free5gc.org:10.100.200.14"
 
   smf:
     image: free5gc/smf:v4.0.0
     command: ./smf -c ./config/smfcfg.yaml
     container_name: smf
+    hostname: smf.free5gc.org
     networks:
       control_network:
         ipv4_address: 10.100.200.12
+        aliases:
+          - smf.free5gc.org
       edge_network: # For PFCP connectivity to UPFs
         ipv4_address: 10.100.100.10
+        aliases:
+          - smf.free5gc.org
     depends_on:
       nrf:
-        condition: service_healthy
+        condition: service_started
     volumes:
-      - ./config/smfcfg.yaml:/free5gc/config/smfcfg.yaml
+      - ./config/ULCL/smfcfg.yaml:/free5gc/config/smfcfg.yaml
       - ./cert:/free5gc/cert
+    extra_hosts:
+      - "smf.free5gc.org:10.100.200.12"
   
   udm:
     container_name: udm
+    hostname: udm.free5gc.org
     image: free5gc/udm:v4.0.0
     command: ./udm -c ./config/udmcfg.yaml
     expose:
@@ -135,12 +163,15 @@ services:
           - udm.free5gc.org
     depends_on:
       mongodb:
-        condition: service_healthy
+        condition: service_started
       nrf:
-        condition: service_healthy
+        condition: service_started
+    extra_hosts:
+      - "udm.free5gc.org:10.100.200.15"
 
   udr:
     container_name: udr
+    hostname: udr.free5gc.org
     image: free5gc/udr:v4.0.0
     command: ./udr -c ./config/udrcfg.yaml
     expose:
@@ -157,12 +188,15 @@ services:
           - udr.free5gc.org
     depends_on:
       mongodb:
-        condition: service_healthy
+        condition: service_started
       nrf:
-        condition: service_healthy
+        condition: service_started
+    extra_hosts:
+      - "udr.free5gc.org:10.100.200.16"
 
   chf:
     container_name: chf
+    hostname: chf.free5gc.org
     image: free5gc/chf:v4.0.0
     command: ./chf -c ./config/chfcfg.yaml
     expose:
@@ -179,14 +213,17 @@ services:
           - chf.free5gc.org
     depends_on:
       mongodb:
-        condition: service_healthy
+        condition: service_started
       nrf:
-        condition: service_healthy
+        condition: service_started
       webui:
         condition: service_started
+    extra_hosts:
+      - "chf.free5gc.org:10.100.200.17"
 
   nef:
     container_name: nef
+    hostname: nef.free5gc.org
     image: free5gc/nef:latest
     command: ./nef -c ./config/nefcfg.yaml
     expose:
@@ -202,12 +239,15 @@ services:
           - nef.free5gc.org
     depends_on:
       mongodb:
-        condition: service_healthy
+        condition: service_started
       nrf:
-        condition: service_healthy
+        condition: service_started
+    extra_hosts:
+      - "nef.free5gc.org:10.100.200.18"
 
   webui:
     container_name: webui
+    hostname: webui.free5gc.org
     image: free5gc/webui:v4.0.0
     command: ./webui -c ./config/webuicfg.yaml
     expose:
@@ -215,11 +255,13 @@ services:
       - "2121"
     volumes:
       - ./config/webuicfg.yaml:/free5gc/config/webuicfg.yaml
+      - ./cert:/free5gc/cert
     environment:
       - GIN_MODE=release
     networks:
       control_network:
         aliases:
+          - webui.free5gc.org
           - webui
     ports:
       - "5000:5000"
@@ -227,14 +269,17 @@ services:
       - "2121:2121"
     depends_on:
       mongodb:
-        condition: service_healthy
+        condition: service_started
       nrf:
-        condition: service_healthy
+        condition: service_started
+    extra_hosts:
+      - "webui.free5gc.org:10.100.200.19"
 
   # Edge UPFs
   upf-edge1:
     image: free5gc/upf:latest
     container_name: upf-edge1
+    hostname: upf-edge1.free5gc.org
     privileged: true
     cap_add:
       - NET_ADMIN
@@ -242,12 +287,19 @@ services:
     networks:
       edge_network:  # For PFCP connectivity
         ipv4_address: 10.100.100.101
+        aliases:
+          - upf-edge1.free5gc.org
       n3_network:    # For connectivity to gNBs
         ipv4_address: 10.200.100.101
+        aliases:
+          - upf-edge1-n3.free5gc.org
       n9_network:    # For connectivity to other UPFs
         ipv4_address: 10.30.100.101
+        aliases:
+          - upf-edge1-n9.free5gc.org
     volumes:
-      - ./config/upf-edge1.yaml:/free5gc/config/upfcfg.yaml
+      - ./config/ULCL/upf-edge1.yaml:/free5gc/config/upfcfg.yaml
+      - ./cert:/free5gc/cert
     environment:
       - HOSTNAME=upf-edge1.free5gc.org
       - GW_ID=upf-edge1
@@ -255,6 +307,7 @@ services:
       - "upf-edge1.free5gc.org:10.100.100.101"
       - "upf-edge1-n3.free5gc.org:10.200.100.101"
       - "upf-edge1-n9.free5gc.org:10.30.100.101"
+      - "smf.free5gc.org:10.100.100.10"
     sysctls:
       - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.forwarding=1
@@ -265,6 +318,7 @@ services:
   upf-edge2:
     image: free5gc/upf:latest
     container_name: upf-edge2
+    hostname: upf-edge2.free5gc.org
     privileged: true
     cap_add:
       - NET_ADMIN
@@ -272,12 +326,19 @@ services:
     networks:
       edge_network:
         ipv4_address: 10.100.100.102
+        aliases:
+          - upf-edge2.free5gc.org
       n3_network:
         ipv4_address: 10.200.100.102
+        aliases:
+          - upf-edge2-n3.free5gc.org
       n9_network:
         ipv4_address: 10.30.100.102
+        aliases:
+          - upf-edge2-n9.free5gc.org
     volumes:
-      - ./config/upf-edge2.yaml:/free5gc/config/upfcfg.yaml
+      - ./config/ULCL/upf-edge2.yaml:/free5gc/config/upfcfg.yaml
+      - ./cert:/free5gc/cert
     environment:
       - HOSTNAME=upf-edge2.free5gc.org
       - GW_ID=upf-edge2
@@ -285,6 +346,7 @@ services:
       - "upf-edge2.free5gc.org:10.100.100.102"
       - "upf-edge2-n3.free5gc.org:10.200.100.102"
       - "upf-edge2-n9.free5gc.org:10.30.100.102"
+      - "smf.free5gc.org:10.100.100.10"
     sysctls:
       - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.forwarding=1
@@ -296,6 +358,7 @@ services:
   upf-agg1:
     image: free5gc/upf:latest
     container_name: upf-agg1
+    hostname: upf-agg1.free5gc.org
     privileged: true
     cap_add:
       - NET_ADMIN
@@ -303,16 +366,22 @@ services:
     networks:
       edge_network:
         ipv4_address: 10.100.100.201
+        aliases:
+          - upf-agg1.free5gc.org
       n9_network:
         ipv4_address: 10.30.100.201
+        aliases:
+          - upf-agg1-n9.free5gc.org
     volumes:
-      - ./config/upf-agg1.yaml:/free5gc/config/upfcfg.yaml
+      - ./config/ULCL/upf-agg1.yaml:/free5gc/config/upfcfg.yaml
+      - ./cert:/free5gc/cert
     environment:
       - HOSTNAME=upf-agg1.free5gc.org
       - GW_ID=upf-agg1
     extra_hosts:
       - "upf-agg1.free5gc.org:10.100.100.201"
       - "upf-agg1-n9.free5gc.org:10.30.100.201"
+      - "smf.free5gc.org:10.100.100.10"
     sysctls:
       - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.forwarding=1
@@ -323,6 +392,7 @@ services:
   upf-agg2:
     image: free5gc/upf:latest
     container_name: upf-agg2
+    hostname: upf-agg2.free5gc.org
     privileged: true
     cap_add:
       - NET_ADMIN
@@ -330,16 +400,22 @@ services:
     networks:
       edge_network:
         ipv4_address: 10.100.100.202
+        aliases:
+          - upf-agg2.free5gc.org
       n9_network:
         ipv4_address: 10.30.100.202
+        aliases:
+          - upf-agg2-n9.free5gc.org
     volumes:
-      - ./config/upf-agg2.yaml:/free5gc/config/upfcfg.yaml
+      - ./config/ULCL/upf-agg2.yaml:/free5gc/config/upfcfg.yaml
+      - ./cert:/free5gc/cert
     environment:
       - HOSTNAME=upf-agg2.free5gc.org
       - GW_ID=upf-agg2
     extra_hosts:
       - "upf-agg2.free5gc.org:10.100.100.202"
       - "upf-agg2-n9.free5gc.org:10.30.100.202"
+      - "smf.free5gc.org:10.100.100.10"
     sysctls:
       - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.forwarding=1
@@ -360,6 +436,7 @@ services:
   upf-core:
     image: free5gc/upf:latest
     container_name: upf-core
+    hostname: upf-core.free5gc.org
     privileged: true
     cap_add:
       - NET_ADMIN
@@ -367,12 +444,19 @@ services:
     networks:
       edge_network:
         ipv4_address: 10.100.100.251
+        aliases:
+          - upf-core.free5gc.org
       n9_network:
         ipv4_address: 10.30.100.251
+        aliases:
+          - upf-core-n9.free5gc.org
       external_network: # N6 connectivity to external networks
         ipv4_address: 10.40.100.251
+        aliases:
+          - upf-core-n6.free5gc.org
     volumes:
-      - ./config/upf-core.yaml:/free5gc/config/upfcfg.yaml
+      - ./config/ULCL/upf-core.yaml:/free5gc/config/upfcfg.yaml
+      - ./cert:/free5gc/cert
     environment:
       - HOSTNAME=upf-core.free5gc.org
       - GW_ID=upf-core
@@ -380,6 +464,7 @@ services:
       - "upf-core.free5gc.org:10.100.100.251"
       - "upf-core-n9.free5gc.org:10.30.100.251"
       - "upf-core-n6.free5gc.org:10.40.100.251"
+      - "smf.free5gc.org:10.100.100.10"
     sysctls:
       - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.forwarding=1
@@ -392,18 +477,28 @@ services:
     image: free5gc/ueransim:latest
     command: ./nr-gnb -c ./config/gnbcfg.yaml
     container_name: gnb1
+    hostname: gnb1.free5gc.org
     networks:
       control_network:
         ipv4_address: 10.100.200.31
+        aliases:
+          - gnb1.free5gc.org
       n3_network:
         ipv4_address: 10.200.100.31
+        aliases:
+          - gnb1-n3.free5gc.org
     volumes:
-      - ./config/gnb1.yaml:/ueransim/config/gnbcfg.yaml
+      - ./config/ULCL/gnb1.yaml:/ueransim/config/gnbcfg.yaml
     environment:
       - GNB_ID=gnb1
       - GNB_NAME=gnb1.free5gc.org
       - MCC=208
       - MNC=93
+    extra_hosts:
+      - "gnb1.free5gc.org:10.100.200.31"
+      - "gnb1-n3.free5gc.org:10.200.100.31"
+      - "amf.free5gc.org:10.100.200.11"
+      - "upf-edge1-n3.free5gc.org:10.200.100.101"
     depends_on:
       amf:
         condition: service_started
@@ -414,18 +509,28 @@ services:
     image: free5gc/ueransim:latest
     command: ./nr-gnb -c ./config/gnbcfg.yaml
     container_name: gnb2
+    hostname: gnb2.free5gc.org
     networks:
       control_network:
         ipv4_address: 10.100.200.32
+        aliases:
+          - gnb2.free5gc.org
       n3_network:
         ipv4_address: 10.200.100.32
+        aliases:
+          - gnb2-n3.free5gc.org
     volumes:
-      - ./config/gnb2.yaml:/ueransim/config/gnbcfg.yaml
+      - ./config/ULCL/gnb2.yaml:/ueransim/config/gnbcfg.yaml
     environment:
       - GNB_ID=gnb2
       - GNB_NAME=gnb2.free5gc.org
       - MCC=208
       - MNC=93
+    extra_hosts:
+      - "gnb2.free5gc.org:10.100.200.32"
+      - "gnb2-n3.free5gc.org:10.200.100.32"
+      - "amf.free5gc.org:10.100.200.11"
+      - "upf-edge2-n3.free5gc.org:10.200.100.102"
     depends_on:
       amf:
         condition: service_started
@@ -435,6 +540,7 @@ services:
 networks:
   # Control plane network
   control_network:
+    driver: bridge
     ipam:
       driver: default
       config:
@@ -442,6 +548,7 @@ networks:
   
   # Management network for PFCP between SMF and UPFs
   edge_network:
+    driver: bridge
     ipam:
       driver: default
       config:
@@ -449,6 +556,7 @@ networks:
   
   # N3 network between gNBs and UPFs
   n3_network:
+    driver: bridge
     ipam:
       driver: default
       config:
@@ -464,7 +572,11 @@ networks:
   
   # External network for N6 interface
   external_network:
+    driver: bridge
     ipam:
       driver: default
       config:
         - subnet: 10.40.100.0/24
+
+volumes:
+  dbdata:
