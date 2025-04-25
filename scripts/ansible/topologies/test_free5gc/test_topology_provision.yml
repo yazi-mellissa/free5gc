@@ -1,6 +1,6 @@
 ---
 - name: Setup free5GC with GTP5G and Docker
-  hosts: localhost
+  hosts: all
   become: yes
   vars:
     free5gc_dir: /opt/free5gc-compose
@@ -57,18 +57,7 @@
       register: lsmod_check
       failed_when: lsmod_check.stdout == ""
 
-    - name: Clone free5gc-compose repository
-      git:
-        repo: https://github.com/free5gc/free5gc-compose
-        dest: "{{ free5gc_dir }}"
-        update: yes
-
     - name: Run free5GC using Docker Compose
-      shell: docker compose -f docker-compose-ulcl.yaml up -d
+      shell: docker compose -f /vagrant/configs/chaining_topology1/docker-compose-ulcl-multi-upf.yaml up -d
       args:
         chdir: "{{ free5gc_dir }}"
-
-  handlers:
-    - name: Add restart always if missing
-      debug:
-        msg: "Updated restart policy in docker-compose-ulcl.yaml"

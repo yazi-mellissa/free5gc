@@ -12,7 +12,7 @@ Vagrant.configure("2") do |config|
       vb.cpus = 2
     end
     master.vm.provision "ansible_local" do |ansible|
-      ansible.playbook = "scripts/ansible/provisions/master_provision.yml"
+      ansible.playbook = "scripts/ansible/topologies/test_free5gc/test_topology_provision.yml"
       ansible.install = true
       ansible.install_mode = "pip"
       ansible.version = "latest"
