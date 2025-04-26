@@ -1,0 +1,79 @@
+info:
+  version: 1.0.0
+  description: gNB1 configuration file
+
+configuration:
+  # gNB identity
+  gnbId: 1
+  name: gnb1.free5gc.org
+  
+  # PLMN identity
+  mcc: 208
+  mnc: 93
+  
+  # Core network connectivity
+  amf:
+    addr: amf.free5gc.org
+    port: 38412
+  
+  # RAN configuration
+  ran:
+    # Radio configuration
+    bandwidthMHz: 20
+    frequencyBand: 78
+    subCarrierSpacing: 30
+    absoluteFrequencyPointA: 620000
+    
+    # Cell configuration
+    cellId: 1
+    tac: 1
+    
+    # Radio access mode
+    mode: TDD
+    
+    # QoS configuration
+    qos:
+      - qfi: 1 # URLLC
+        priority: 10
+        preemptionCapability: true
+        preemptionVulnerability: false
+        packetDelayBudget: 10
+        packetErrorRate: 10^-6
+        averagingWindow: 2000
+      - qfi: 2 # Standard
+        priority: 20
+        preemptionCapability: false
+        preemptionVulnerability: true
+        packetDelayBudget: 300
+        packetErrorRate: 10^-4
+        averagingWindow: 2000
+    
+    # UE-specific configuration
+    ueSubnet: "10.1.0.0/16"
+    
+  # GTPU configuration  
+  gtpu:
+    addr: gnb1.free5gc.org
+    port: 2152
+  
+  # Network interfaces
+  network:
+    # N2 interface to AMF (control plane)
+    n2:
+      interface: "eth0"
+      ipv4: "auto"
+    # N3 interface to UPF (user plane)
+    n3:
+      interface: "eth1"
+      ipv4: "auto"
+  
+  # Slicing configuration
+  slicing:
+    - sst: 1
+      sd: "010203"
+      defaultQfi: 1
+
+logger:
+  enable: true
+  level: info
+  reportCaller: false

@@ -1,0 +1,62 @@
+info:
+  version: 1.0.0
+  description: UPF Edge2 configuration file
+
+configuration:
+  # PFCP related configuration
+  pfcp:
+    nodeID: upf-edge2.free5gc.org
+    addr: upf-edge2.free5gc.org
+    port: 8805
+    heartbeatPeriod: 1000
+    retransTimeout: 500
+    maxRetrans: 3
+
+  # GTPU related configuration
+  gtpu:
+    # The IP address of N3 interface on this UPF (toward RAN)
+    n3Addr: upf-edge2-n3.free5gc.org
+    # The IP address of N9 interfaces on this UPF (toward other UPFs)
+    n9Addr: upf-edge2-n9.free5gc.org
+    # N3/N9 GTPU listening port
+    port: 2152
+
+  # Uplink Classifier configuration
+  ulcl:
+    enable: true
+
+  # Buffering parameters
+  buffering:
+    enable: true
+    maxSize: 10
+    maxTime: 10
+
+  # DNN configurations
+  dnn:
+    internet:
+      cidr: 10.70.0.0/16
+      natEnable: true
+    urllc:
+      cidr: 10.71.0.0/16
+      natEnable: false
+    mec:
+      cidr: 10.72.0.0/16
+      natEnable: false
+      
+  # QoS configuration
+  qos:
+    - qfi: 1 # URLLC
+      mbr:
+        uplink: 100000000
+        downlink: 100000000
+      priority: 10
+    - qfi: 2 # Standard internet
+      mbr:
+        uplink: 20000000
+        downlink: 50000000
+      priority: 30
+
+logger:
+  enable: true
+  level: info
+  reportCaller: false
