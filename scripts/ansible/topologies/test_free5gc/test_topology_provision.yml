@@ -58,6 +58,6 @@
       failed_when: lsmod_check.stdout == ""
 
     - name: Run free5GC using Docker Compose
-      shell: docker compose -f /vagrant/configs/chaining_topology1/docker-compose-ulcl-multi-upf.yaml up -d
+      shell: docker compose -f /vagrant/configs/chaining_topology2/docker-compose2.yaml up -d
       args:
         chdir: "{{ free5gc_dir }}"

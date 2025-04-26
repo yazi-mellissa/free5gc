@@ -38,7 +38,7 @@ services:
       - "nrf.free5gc.org:10.100.200.10"
 
   amf:
-    image: free5gc/amf:latest
+    image: free5gc/amf:v4.0.0
     command: ./amf -c ./config/amfcfg.yaml
     container_name: amf
     hostname: amf.free5gc.org
@@ -224,7 +224,7 @@ services:
   nef:
     container_name: nef
     hostname: nef.free5gc.org
-    image: free5gc/nef:latest
+    image: free5gc/nef:v4.0.0
     command: ./nef -c ./config/nefcfg.yaml
     expose:
       - "8000"
@@ -277,7 +277,7 @@ services:
 
   # Edge UPFs
   upf-edge1:
-    image: free5gc/upf:latest
+    image: free5gc/upf:v4.0.0
     container_name: upf-edge1
     hostname: upf-edge1.free5gc.org
     privileged: true
@@ -316,7 +316,7 @@ services:
         condition: service_started
 
   upf-edge2:
-    image: free5gc/upf:latest
+    image: free5gc/upf:v4.0.0
     container_name: upf-edge2
     hostname: upf-edge2.free5gc.org
     privileged: true
@@ -356,7 +356,7 @@ services:
 
   # Aggregation UPFs
   upf-agg1:
-    image: free5gc/upf:latest
+    image: free5gc/upf:v4.0.0
     container_name: upf-agg1
     hostname: upf-agg1.free5gc.org
     privileged: true
@@ -390,7 +390,7 @@ services:
         condition: service_started
 
   upf-agg2:
-    image: free5gc/upf:latest
+    image: free5gc/upf:v4.0.0
     container_name: upf-agg2
     hostname: upf-agg2.free5gc.org
     privileged: true
@@ -434,7 +434,7 @@ services:
 
   # Core UPF
   upf-core:
-    image: free5gc/upf:latest
+    image: free5gc/upf:v4.0.0
     container_name: upf-core
     hostname: upf-core.free5gc.org
     privileged: true
@@ -474,7 +474,7 @@ services:
 
   # gNodeB simulators
   gnb1:
-    image: free5gc/ueransim:latest
+    image: free5gc/ueransim:v4.0.0
     command: ./nr-gnb -c ./config/gnbcfg.yaml
     container_name: gnb1
     hostname: gnb1.free5gc.org
@@ -506,7 +506,7 @@ services:
         condition: service_started
 
   gnb2:
-    image: free5gc/ueransim:latest
+    image: free5gc/ueransim:v4.0.0
     command: ./nr-gnb -c ./config/gnbcfg.yaml
     container_name: gnb2
     hostname: gnb2.free5gc.org

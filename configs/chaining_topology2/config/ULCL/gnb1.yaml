@@ -1,0 +1,35 @@
+mcc: 208
+mnc: 93
+nci: 0x000000010
+idLength: 32
+tac: 1
+
+amfConfigs:
+  - address: amf.free5gc.org
+    port: 38412
+
+linkIp: 127.0.0.1
+
+linkConfigs:
+  - name: gNB1 to UPF-Edge1
+    address: gnb1.free5gc.org
+    port: 2152
+    type: N3
+
+ngapIp: gnb1.free5gc.org
+gtpIp: gnb1.free5gc.org
+
+slices:
+  - sst: 1
+    sd: 010203
+
+supportedTAs:
+  - tac: 1
+    broadcastPLMNs:
+      - mcc: 208
+        mnc: 93
+    supportedSnssaiList:
+      - sst: 1
+        sd: 010203
+
+ignoreStreamIds: true

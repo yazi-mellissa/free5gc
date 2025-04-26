@@ -1,0 +1,361 @@
+version: '3.8'
+
+services:
+  # Core Network Functions
+  mongodb:
+    image: mongo:4.4
+    container_name: mongodb
+    networks:
+      5gcore:
+        aliases:
+          - mongodb
+    volumes:
+      - mongodbdata:/data/db
+    restart: always
+
+  nrf:
+    image: free5gc/nrf:v4.0.0
+    container_name: nrf
+    expose: 
+      - "8000"
+    depends_on:
+      - mongodb
+    networks:
+      5gcore:
+        aliases:
+          - nrf.free5gc.org
+    volumes:
+      - ./config/nrfcfg.yaml:/free5gc/config/nrfcfg.yaml
+      - ./cert:/free5gc/cert
+    command: ["/free5gc/nrf", "-c", "/free5gc/config/nrfcfg.yaml"]
+    restart: always
+
+  amf:
+    image: free5gc/amf:latest
+    container_name: amf
+    depends_on:
+      - nrf
+    networks:
+      5gcore:
+        aliases:
+          - amf.free5gc.org
+    volumes:
+      - ./config/amfcfg.yaml:/free5gc/config/amfcfg.yaml
+      - ./cert:/free5gc/cert
+    command: ["/free5gc/amf", "-c", "/free5gc/config/amfcfg.yaml"]
+    restart: always
+
+  ausf:
+    container_name: ausf
+    hostname: ausf.free5gc.org
+    image: free5gc/ausf:v4.0.0
+    volumes:
+      - ./config/ausfcfg.yaml:/free5gc/config/ausfcfg.yaml
+      - ./cert:/free5gc/cert
+    environment:
+      GIN_MODE: release
+    networks:
+      5gcore:
+        aliases:
+          - ausf.free5gc.org
+    depends_on:
+      - nrf
+    command: ["/free5gc/ausf", "-c", "/free5gc/config/ausfcfg.yaml"]
+
+  nssf:
+    container_name: nssf
+    hostname: nssf.free5gc.org
+    image: free5gc/nssf:v4.0.0
+    volumes:
+      - ./config/nssfcfg.yaml:/free5gc/config/nssfcfg.yaml
+      - ./cert:/free5gc/cert
+    environment:
+      GIN_MODE: release
+    networks:
+      5gcore:
+        aliases:
+          - nssf.free5gc.org
+    depends_on:
+      - nrf
+    command: ["/free5gc/nssf", "-c", "/free5gc/config/nssfcfg.yaml"]
+
+  pcf:
+    container_name: pcf
+    hostname: pcf.free5gc.org
+    image: free5gc/pcf:v4.0.0
+    volumes:
+      - ./config/pcfcfg.yaml:/free5gc/config/pcfcfg.yaml
+      - ./cert:/free5gc/cert
+    environment:
+      GIN_MODE: release
+    networks:
+      5gcore:
+        aliases:
+          - pcf.free5gc.org
+    depends_on:
+      - nrf
+    command: ["/free5gc/pcf", "-c", "/free5gc/config/pcfcfg.yaml"]
+
+  smf:
+    image: free5gc/smf:v4.0.0
+    container_name: smf
+    depends_on:
+      - nrf
+      - upf-edge1
+      - upf-edge2
+      - upf-agg1
+      - upf-agg2
+      - upf-core  
+    networks:
+      5gcore:
+        aliases:
+          - smf.free5gc.org
+    volumes:
+      - ./config/ULCL/smfcfg.yaml:/free5gc/config/smfcfg.yaml
+      - ./cert:/free5gc/cert
+    command: ["/free5gc/smf", "-c", "/free5gc/config/smfcfg.yaml"]
+    restart: always
+
+  udm:
+    container_name: udm
+    hostname: udm.free5gc.org
+    image: free5gc/udm:v4.0.0
+    volumes:
+      - ./config/udmcfg.yaml:/free5gc/config/udmcfg.yaml
+      - ./cert:/free5gc/cert
+    environment:
+      GIN_MODE: release
+    networks:
+      5gcore:
+        aliases:
+          - udm.free5gc.org
+    depends_on:
+      - mongodb
+      - nrf
+    command: ["/free5gc/udm", "-c", "/free5gc/config/udmcfg.yaml"]
+
+  udr:
+    container_name: udr
+    hostname: udr.free5gc.org
+    image: free5gc/udr:v4.0.0
+    volumes:
+      - ./config/udrcfg.yaml:/free5gc/config/udrcfg.yaml
+      - ./cert:/free5gc/cert
+    environment:
+      DB_URI: mongodb://mongodb/free5gc
+      GIN_MODE: release
+    networks:
+      5gcore:
+        aliases:
+          - udr.free5gc.org
+    depends_on:
+      - mongodb
+      - nrf
+    command: ["/free5gc/udr", "-c", "/free5gc/config/udrcfg.yaml"]
+
+  chf:
+    container_name: chf
+    hostname: chf.free5gc.org
+    image: free5gc/chf:v4.0.0
+    volumes:
+      - ./config/chfcfg.yaml:/free5gc/config/chfcfg.yaml
+      - ./cert:/free5gc/cert
+    environment:
+      DB_URI: mongodb://mongodb/free5gc
+      GIN_MODE: release
+    networks:
+      5gcore:
+        aliases:
+          - chf.free5gc.org
+    depends_on:
+      - mongodb
+      - nrf
+      - webui
+    command: ["/free5gc/chf", "-c", "/free5gc/config/chfcfg.yaml"]
+
+  nef:
+    container_name: nef
+    hostname: nef.free5gc.org
+    image: free5gc/nef:latest
+    volumes:
+      - ./config/nefcfg.yaml:/free5gc/config/nefcfg.yaml
+      - ./cert:/free5gc/cert
+    environment:
+      GIN_MODE: release
+    networks:
+      5gcore:
+        aliases:
+          - nef.free5gc.org
+    depends_on:
+      - mongodb
+      - nrf
+    command: ["/free5gc/nef", "-c", "/free5gc/config/nefcfg.yaml"]
+
+  # User Plane Functions
+  upf-edge1:
+    image: free5gc/upf:latest
+    container_name: upf-edge1
+    privileged: true
+    depends_on:
+      - nrf
+    networks:
+      5gcore:
+        aliases:
+          - upf-edge1.free5gc.org
+          - upf-edge1-n3.free5gc.org
+          - upf-edge1-n9.free5gc.org
+    volumes:
+      - ./config/ULCL/upf-edge1.yaml:/free5gc/config/upfcfg.yaml
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.ip_forward=1
+    restart: always
+    command: ["/free5gc/upf", "-c", "/free5gc/config/upfcfg.yaml"]
+
+  upf-edge2:
+    image: free5gc/upf:latest
+    container_name: upf-edge2
+    privileged: true
+    depends_on:
+      - nrf
+    networks:
+      5gcore:
+        aliases:
+          - upf-edge2.free5gc.org
+          - upf-edge2-n3.free5gc.org
+          - upf-edge2-n9.free5gc.org
+    volumes:
+      - ./config/ULCL/upf-edge2.yaml:/free5gc/config/upfcfg.yaml
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.ip_forward=1
+    restart: always
+    command: ["/free5gc/upf", "-c", "/free5gc/config/upfcfg.yaml"]
+
+  upf-agg1:
+    image: free5gc/upf:latest
+    container_name: upf-agg1
+    privileged: true
+    depends_on:
+      - nrf
+    networks:
+      5gcore:
+        aliases:
+          - upf-agg1.free5gc.org
+          - upf-agg1-n9.free5gc.org
+    volumes:
+      - ./config/ULCL/upf-agg1.yaml:/free5gc/config/upfcfg.yaml
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.ip_forward=1
+    restart: always
+    command: ["/free5gc/upf", "-c", "/free5gc/config/upfcfg.yaml"]
+
+  upf-agg2:
+    image: free5gc/upf:latest
+    container_name: upf-agg2
+    privileged: true
+    depends_on:
+      - nrf
+    networks:
+      5gcore:
+        aliases:
+          - upf-agg2.free5gc.org
+          - upf-agg2-n9.free5gc.org
+    volumes:
+      - ./config/ULCL/upf-agg2.yaml:/free5gc/config/upfcfg.yaml
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.ip_forward=1
+    restart: always
+    command: ["/free5gc/upf", "-c", "/free5gc/config/upfcfg.yaml"]
+
+  upf-core:
+    image: free5gc/upf:latest
+    container_name: upf-core
+    privileged: true
+    depends_on:
+      - nrf
+    networks:
+      5gcore:
+        aliases:
+          - upf-core.free5gc.org
+          - upf-core-n9.free5gc.org
+          - upf-core-n6.free5gc.org
+    volumes:
+      - ./config/ULCL/upf-core.yaml:/free5gc/config/upfcfg.yaml
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.ip_forward=1
+    restart: always
+    command: ["/free5gc/upf", "-c", "/free5gc/config/upfcfg.yaml"]
+
+  # Access Network Functions
+  gnb1:
+    image: free5gc/ueransim:latest
+    container_name: gnb1
+    privileged: true
+    depends_on:
+      - amf
+    networks:
+      5gcore:
+        aliases:
+          - gnb1.free5gc.org
+    volumes:
+      - ./config/ULCL/gnb1.yaml:/free5gc/config/gnbcfg.yaml
+    command: ["./nr-gnb", "-c", "/free5gc/config/gnbcfg.yaml"]
+    restart: always
+
+  gnb2:
+    image: free5gc/ueransim:latest
+    container_name: gnb2
+    privileged: true
+    depends_on:
+      - amf
+    networks:
+      5gcore:
+        aliases:
+          - gnb2.free5gc.org
+    volumes:
+      - ./config/ULCL/gnb2.yaml:/free5gc/config/gnbcfg.yaml
+    command: ["./nr-gnb", "-c", "/free5gc/config/gnbcfg.yaml"]
+    restart: always
+
+  # Supporting services
+  webui:
+    image: free5gc/webui:v4.0.0
+    container_name: webui
+    volumes:
+      - ./config/webuicfg.yaml:/free5gc/config/webuicfg.yaml
+    depends_on:
+      - mongodb
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/free5gc
+    networks:
+      5gcore:
+        aliases:
+          - webui.free5gc.org
+    ports:
+      - "5000:5000"
+    command: ["./webui"]
+    restart: always
+
+networks:
+  5gcore:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16
+
+volumes:
+  mongodbdata:

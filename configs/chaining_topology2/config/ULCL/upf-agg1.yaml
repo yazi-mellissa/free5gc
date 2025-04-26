@@ -1,0 +1,26 @@
+version: 1.0.3
+description: UPF-Agg1 initial local configuration
+
+pfcp:
+  addr: upf-agg1.free5gc.org
+  nodeID: upf-agg1.free5gc.org
+  retransTimeout: 1s
+  maxRetrans: 3
+
+gtpu:
+  forwarder: gtp5g
+  ifList:
+    - addr: upf-agg1-n9.free5gc.org
+      type: N9
+
+dnnList:
+  - dnn: mec
+    cidr: 10.80.0.0/16
+  - dnn: internet
+    cidr: 10.81.0.0/16
+    natIfname: eth0
+
+logger:
+  enable: true
+  level: info
+  reportCaller: false

@@ -1,0 +1,33 @@
+version: 1.0.3
+description: UPF-Core initial local configuration
+
+pfcp:
+  addr: upf-core.free5gc.org
+  nodeID: upf-core.free5gc.org
+  retransTimeout: 1s
+  maxRetrans: 3
+
+gtpu:
+  forwarder: gtp5g
+  ifList:
+    - addr: upf-core-n9.free5gc.org
+      type: N9
+
+dnnList:
+  - dnn: internet
+    cidr: 10.100.0.0/16
+    natIfname: eth0
+  - dnn: urllc
+    cidr: 10.101.0.0/16
+    natIfname: eth0
+  - dnn: mec
+    cidr: 10.102.0.0/16
+    natIfname: eth0
+  - dnn: ims
+    cidr: 10.103.0.0/16
+    natIfname: eth0
+
+logger:
+  enable: true
+  level: info
+  reportCaller: false

@@ -1,0 +1,33 @@
+version: 1.0.3
+description: UPF-Edge1 initial local configuration
+
+pfcp:
+  addr: upf-edge1.free5gc.org
+  nodeID: upf-edge1.free5gc.org
+  retransTimeout: 1s
+  maxRetrans: 3
+
+gtpu:
+  forwarder: gtp5g
+  ifList:
+    - addr: upf-edge1-n3.free5gc.org
+      type: N3
+    - addr: upf-edge1-n9.free5gc.org
+      type: N9
+
+dnnList:
+  - dnn: internet
+    cidr: 10.60.0.0/16
+    natIfname: eth0
+  - dnn: urllc
+    cidr: 10.61.0.0/16
+  - dnn: mec
+    cidr: 10.62.0.0/16
+  - dnn: ims
+    cidr: 10.63.0.0/16
+    natIfname: eth0
+
+logger:
+  enable: true
+  level: info
+  reportCaller: false
