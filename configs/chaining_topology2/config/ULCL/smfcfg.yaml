@@ -40,6 +40,7 @@ configuration:
   locality: area1
   pfcp:
     nodeID: smf.free5gc.org
+    forceDeletePFCP: true
     listenAddr: smf.free5gc.org
     externalAddr: smf.free5gc.org
     heartbeatInterval: 1s  # Reduced for faster failure detection in URLLC
@@ -241,7 +242,7 @@ configuration:
     - dnn: internet
       routeProfiles:
         - route:
-            - nodeId: upf-edge2.free5gc.org
+            - nodeId: upf-edge1.free5gc.org
             - nodeId: upf-core.free5gc.org
     - dnn: ims
       routeProfiles:

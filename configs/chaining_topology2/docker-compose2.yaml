@@ -338,7 +338,7 @@ services:
     volumes:
       - ./config/ULCL/gnb2.yaml:/free5gc/config/gnbcfg.yaml
       - ./config/ULCL/uecfg2.yaml:/free5gc/config/uercfg.yaml
-    command: ["./nr-gnb", "-c", "/free5gc/config/gnbcfg.yaml"]
+    command: /bin/bash -c "./nr-gnb -c /free5gc/config/gnbcfg.yaml & ./nr-ue -c /free5gc/config/uercfg.yaml"
     restart: always
 
   # Supporting services
