@@ -173,6 +173,24 @@ configuration:
         B: UPF5
       - A: UPF1
         B: UPF5
+  ulcl: true
+  ulclRouteInfo:
+    - dnn: urllc
+      routeProfiles:
+        - qfi: 1
+          qos:
+            5qi: 6
+            arp:
+              priorityLevel: 1
+          route:
+            - nodeId: upf-edge1.free5gc.org
+            - nodeId: upf-agg2.free5gc.org
+            - nodeId: upf-core.free5gc.org
+    - dnn: mec
+      routeProfiles:
+        - route:
+            - nodeId: upf-edge1.free5gc.org
+            - nodeId: upf-agg1.free5gc.org
   t3591:
     enable: true
     expireTime: 16s
@@ -186,8 +204,8 @@ configuration:
   urrPeriod: 10
   urrThreshold: 1000
   requestedUnit: 1000
-  ulcl: true
+ 
 logger:
   enable: true
-  level: info
+  level: debug
   reportCaller: false

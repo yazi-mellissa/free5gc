@@ -52,6 +52,7 @@ configuration:
     - ims
   nrfUri: http://nrf.free5gc.org:8000 # a valid URI of NRF
   nrfCertPem: cert/nrf.pem
+  AUSFUri: http://ausf.free5gc.org:8000
   security: # NAS security parameters
     integrityOrder: # the priority of integrity algorithms
       - NIA2
@@ -128,8 +129,8 @@ configuration:
 
 logger: # log output setting
   enable: true # true or false
-  level: info # how detailed to output, value: trace, debug, info, warn, error, fatal, panic
+  level: debug # how detailed to output, value: trace, debug, info, warn, error, fatal, panic
   reportCaller: false # enable the caller report or not, value: true or false
 
-OAuth:
-  Enable: false
+OAuth2:
+  Enable: true

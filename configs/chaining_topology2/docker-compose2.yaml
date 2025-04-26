@@ -11,6 +11,12 @@ services:
           - mongodb
     volumes:
       - mongodbdata:/data/db
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     restart: always
 
   nrf:
@@ -31,7 +37,7 @@ services:
     restart: always
 
   amf:
-    image: free5gc/amf:latest
+    image: free5gc/amf:v4.0.0
     container_name: amf
     depends_on:
       - nrf
@@ -113,6 +119,7 @@ services:
     volumes:
       - ./config/ULCL/smfcfg.yaml:/free5gc/config/smfcfg.yaml
       - ./cert:/free5gc/cert
+      - ./config/ULCL/uerouting.yaml:/free5gc/config/uerouting.yaml
     command: ["/free5gc/smf", "-c", "/free5gc/config/smfcfg.yaml"]
     restart: always
 
@@ -151,6 +158,8 @@ services:
     depends_on:
       - mongodb
       - nrf
+    ports:
+      - "8001:8001"
     command: ["/free5gc/udr", "-c", "/free5gc/config/udrcfg.yaml"]
 
   chf:
@@ -313,9 +322,9 @@ services:
           - gnb1.free5gc.org
     volumes:
       - ./config/ULCL/gnb1.yaml:/free5gc/config/gnbcfg.yaml
-    command: ["./nr-gnb", "-c", "/free5gc/config/gnbcfg.yaml"]
+      - ./config/ULCL/uecfg1.yaml:/free5gc/config/uercfg.yaml
+    command: /bin/bash -c "./nr-gnb -c /free5gc/config/gnbcfg.yaml & ./nr-ue -c /free5gc/config/uercfg.yaml"
     restart: always
-
   gnb2:
     image: free5gc/ueransim:latest
     container_name: gnb2
@@ -328,6 +337,7 @@ services:
           - gnb2.free5gc.org
     volumes:
       - ./config/ULCL/gnb2.yaml:/free5gc/config/gnbcfg.yaml
+      - ./config/ULCL/uecfg2.yaml:/free5gc/config/uercfg.yaml
     command: ["./nr-gnb", "-c", "/free5gc/config/gnbcfg.yaml"]
     restart: always
 

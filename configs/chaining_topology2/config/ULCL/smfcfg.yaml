@@ -16,6 +16,7 @@ configuration:
     - nsmf-pdusession
     - nsmf-event-exposure
     - nsmf-oam
+  nrfUri: http://nrf.free5gc.org:8000
   snssaiInfos:
     - sNssai:
         sst: 1
@@ -190,14 +191,6 @@ configuration:
               - urllc
               - mec
               - ims
-          - interfaceType: N6
-            endpoints:
-              - upf-core-n6.free5gc.org
-            networkInstances:
-              - internet
-              - urllc
-              - mec
-              - ims
     links:
       # gNB to Edge UPF connections
       - A: gNB1
@@ -226,19 +219,36 @@ configuration:
         B: UPF-Core
       - A: UPF-Agg2
         B: UPF-Core
-  
-  # Traffic steering conditions for ULCL
-  trafficroutes:
-    # URLLC traffic gets priority routing
-    - destCidr: 0.0.0.0/0
-      routingRule: "UPF-Edge1 -> UPF-Agg2 -> UPF-Core"
-      qosId: 1  # QFI associated with URLLC traffic
-    
-    # MEC traffic stays local when possible
-    - destCidr: 172.16.200.0/24
-      routingRule: "UPF-Edge1 -> UPF-Agg1"
-      dnn: "mec"
-  
+        
+  ulcl: true  # Enable ULCL for traffic classification
+  ulclRouteInfo:
+    - dnn: urllc
+      routeProfiles:
+        - qfi: 1
+          qos:
+            5qi: 6
+            arp:
+              priorityLevel: 1
+          route:
+            - nodeId: upf-edge1.free5gc.org
+            - nodeId: upf-agg2.free5gc.org
+            - nodeId: upf-core.free5gc.org
+    - dnn: mec
+      routeProfiles:
+        - route:
+            - nodeId: upf-edge1.free5gc.org
+            - nodeId: upf-agg1.free5gc.org
+    - dnn: internet
+      routeProfiles:
+        - route:
+            - nodeId: upf-edge2.free5gc.org
+            - nodeId: upf-core.free5gc.org
+    - dnn: ims
+      routeProfiles:
+        - route:
+            - nodeId: upf-edge1.free5gc.org
+            - nodeId: upf-core.free5gc.org
+
   t3591:
     enable: true
     expireTime: 5s  # Reduced for faster recovery in URLLC
@@ -247,13 +257,11 @@ configuration:
     enable: true
     expireTime: 5s
     maxRetryTimes: 2
-  nrfUri: http://nrf.free5gc.org:8000
   urrPeriod: 10
   urrThreshold: 1000
   requestedUnit: 1000
-  ulcl: true  # Enable ULCL for traffic classification
-
+  
 logger:
   enable: true
-  level: info
+  level: debug
   reportCaller: false

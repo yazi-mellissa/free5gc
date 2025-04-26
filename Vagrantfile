@@ -5,7 +5,7 @@ Vagrant.configure("2") do |config|
     master.vm.box = "ubuntu/jammy64"
     master.vm.hostname = "microk8s-master"
     master.vm.network "private_network", ip: MASTER_IPv4_ADDR, hostname: true
-    master.vm.network "forwarded_port", guest: 3000, host: 8081
+    master.vm.network "forwarded_port", guest: 5000, host: 8081
     master.vm.provider "virtualbox" do |vb|
       vb.linked_clone = true
       vb.memory = "4096"

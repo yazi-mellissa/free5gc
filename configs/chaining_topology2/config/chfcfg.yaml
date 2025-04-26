@@ -18,7 +18,7 @@ configuration:
     - nchf-convergedcharging # Nchf_AMPolicyControl service
   mongodb: # the mongodb connected by this CHF
     name: free5gc # name of the mongodb
-    url: mongodb://db:27017 # a valid URL of the mongodb
+    url: mongodb://mongodb:27017 # a valid URL of the mongodb
   quotaValidityTime: 10000
   volumeLimit: 50000
   volumeLimitPDU: 10000
