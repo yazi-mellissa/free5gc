@@ -6,15 +6,15 @@ configuration:
   pcfName: PCF # the name of this PCF
   sbi: # Service-based interface information
     scheme: http # the protocol for sbi (http or https)
-    registerIPv4: pcf.free5gc.org # IP used to register to NRF
-    bindingIPv4: pcf.free5gc.org  # IP used to bind the service
+    registerIPv4: 172.30.0.15 # IP used to register to NRF
+    bindingIPv4: 172.30.0.15  # IP used to bind the service
     port: 8000              # port used to bind the service
     tls: # the local path of TLS key
       pem: cert/pcf.pem # PCF TLS Certificate
       key: cert/pcf.key # PCF TLS Private key
   timeFormat: 2019-01-02 15:04:05 # time format of this PCF
   defaultBdtRefId: BdtPolicyId-   # BDT Reference ID, indicating transfer policies of background data transfer.
-  nrfUri: http://nrf.free5gc.org:8000  # a valid URI of NRF
+  nrfUri: http://172.30.0.11:8000  # a valid URI of NRF
   nrfCertPem: cert/nrf.pem
   serviceList:   # the SBI services provided by this PCF, refer to TS 29.507
     - serviceName: npcf-am-policy-control # Npcf_AMPolicyControl service
@@ -29,7 +29,44 @@ configuration:
     name: free5gc                  # name of the mongodb
     url: mongodb://mongodb:27017 # a valid URL of the mongodb
   locality: area1 # Name of the location where a set of AMF, SMF, PCF and UPFs are located
-
+   # Configuration des politiques par défaut
+  dnnConfiguration:
+    internet:
+      5qi: 9
+      arp:
+        priorityLevel: 8
+        preemptCap: NOT_PREEMPT
+        preemptVuln: NOT_PREEMPTABLE
+      sessionAmbr:
+        uplink: 100Mbps
+        downlink: 100Mbps
+    urllc:
+      5qi: 6  # Valeur optimisée pour URLLC
+      arp:
+        priorityLevel: 3  # Priorité élevée
+        preemptCap: PREEMPT
+        preemptVuln: NOT_PREEMPTABLE
+      sessionAmbr:
+        uplink: 50Mbps
+        downlink: 50Mbps
+    mec:
+      5qi: 7
+      arp:
+        priorityLevel: 5
+        preemptCap: NOT_PREEMPT
+        preemptVuln: NOT_PREEMPTABLE
+      sessionAmbr:
+        uplink: 200Mbps
+        downlink: 200Mbps
+    ims:
+      5qi: 5
+      arp:
+        priorityLevel: 4
+        preemptCap: NOT_PREEMPT
+        preemptVuln: NOT_PREEMPTABLE
+      sessionAmbr:
+        uplink: 50Mbps
+        downlink: 50Mbps
 logger: # log output setting
   enable: true # true or false
   level: info # how detailed to output, value: trace, debug, info, warn, error, fatal, panic

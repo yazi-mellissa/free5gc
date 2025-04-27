@@ -2,27 +2,30 @@ version: 1.0.3
 description: UPF-Edge2 initial local configuration
 
 pfcp:
-  addr: upf-edge2.free5gc.org
-  nodeID: upf-edge2.free5gc.org
+  addr: 172.32.0.34  # Adresse dans le réseau edge
+  nodeID: 172.32.0.34 
   retransTimeout: 1s
   maxRetrans: 3
 
 gtpu:
   forwarder: gtp5g
   ifList:
-    - addr: upf-edge2-n3.free5gc.org
+    - addr: 172.32.0.34  # Interface vers les gNB
       type: N3
-    - addr: upf-edge2-n9.free5gc.org
+      name: n3
+    - addr: 172.32.0.34  # Interface vers UPF-Agg
       type: N9
+      name: n9
 
 dnnList:
   - dnn: internet
     cidr: 10.70.0.0/16
-    natIfname: eth0
   - dnn: urllc
     cidr: 10.71.0.0/16
   - dnn: mec
     cidr: 10.72.0.0/16
+  - dnn: ims
+    cidr: 10.73.0.0/16
 
 logger:
   enable: true

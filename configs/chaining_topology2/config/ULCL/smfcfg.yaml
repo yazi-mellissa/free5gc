@@ -6,8 +6,8 @@ configuration:
   smfName: SMF
   sbi:
     scheme: http
-    registerIPv4: smf.free5gc.org
-    bindingIPv4: smf.free5gc.org
+    registerIPv4: 172.30.0.16
+    bindingIPv4: 172.30.0.16
     port: 8000
     tls:
       key: cert/smf.key
@@ -16,7 +16,7 @@ configuration:
     - nsmf-pdusession
     - nsmf-event-exposure
     - nsmf-oam
-  nrfUri: http://nrf.free5gc.org:8000
+  nrfUri: http://172.30.0.11:8000
   snssaiInfos:
     - sNssai:
         sst: 1
@@ -39,22 +39,23 @@ configuration:
       mnc: 93
   locality: area1
   pfcp:
-    nodeID: smf.free5gc.org
+    nodeID: 172.30.0.16
     forceDeletePFCP: true
-    listenAddr: smf.free5gc.org
-    externalAddr: smf.free5gc.org
-    heartbeatInterval: 1s  # Reduced for faster failure detection in URLLC
+    listenAddr: 172.30.0.16
+    externalAddr: 172.30.0.16
+    heartbeatInterval: 1s
+  
   userplaneInformation:
     upNodes:
       gNB1:
         type: AN
-        nodeID: gnb1.free5gc.org
+        nodeID: 172.32.0.41
       gNB2:
         type: AN
-        nodeID: gnb2.free5gc.org
+        nodeID: 172.32.0.42
       UPF-Edge1:
         type: UPF
-        nodeID: upf-edge1.free5gc.org
+        nodeID: 172.32.0.33
         sNssaiUpfInfos:
           - sNssai:
               sst: 1
@@ -75,7 +76,7 @@ configuration:
         interfaces:
           - interfaceType: N3
             endpoints:
-              - upf-edge1-n3.free5gc.org
+              - 172.32.0.33
             networkInstances:
               - internet
               - urllc
@@ -83,7 +84,7 @@ configuration:
               - ims
           - interfaceType: N9
             endpoints:
-              - upf-edge1-n9.free5gc.org
+              - 172.32.0.33
             networkInstances:
               - internet
               - urllc
@@ -91,7 +92,7 @@ configuration:
               - ims
       UPF-Edge2:
         type: UPF
-        nodeID: upf-edge2.free5gc.org
+        nodeID: 172.32.0.34
         sNssaiUpfInfos:
           - sNssai:
               sst: 1
@@ -109,21 +110,21 @@ configuration:
         interfaces:
           - interfaceType: N3
             endpoints:
-              - upf-edge2-n3.free5gc.org
+              - 172.32.0.34
             networkInstances:
               - internet
               - urllc
               - mec
           - interfaceType: N9
             endpoints:
-              - upf-edge2-n9.free5gc.org
+              - 172.32.0.34
             networkInstances:
               - internet
               - urllc
               - mec
       UPF-Agg1:
         type: UPF
-        nodeID: upf-agg1.free5gc.org
+        nodeID: 172.31.0.31
         sNssaiUpfInfos:
           - sNssai:
               sst: 1
@@ -138,13 +139,14 @@ configuration:
         interfaces:
           - interfaceType: N9
             endpoints:
-              - upf-agg1-n9.free5gc.org
+              - 172.31.0.31
+              - 172.32.0.31
             networkInstances:
               - mec
               - internet
       UPF-Agg2:
         type: UPF
-        nodeID: upf-agg2.free5gc.org
+        nodeID: 172.31.0.32
         sNssaiUpfInfos:
           - sNssai:
               sst: 1
@@ -159,13 +161,14 @@ configuration:
         interfaces:
           - interfaceType: N9
             endpoints:
-              - upf-agg2-n9.free5gc.org
+              - 172.31.0.32
+              - 172.32.0.32
             networkInstances:
               - urllc
               - ims
       UPF-Core:
         type: UPF
-        nodeID: upf-core.free5gc.org
+        nodeID: 172.30.0.30
         sNssaiUpfInfos:
           - sNssai:
               sst: 1
@@ -186,20 +189,18 @@ configuration:
         interfaces:
           - interfaceType: N9
             endpoints:
-              - upf-core-n9.free5gc.org
+              - 172.31.0.30
             networkInstances:
               - internet
               - urllc
               - mec
               - ims
     links:
-      # gNB to Edge UPF connections
       - A: gNB1
         B: UPF-Edge1
       - A: gNB2
         B: UPF-Edge2
       
-      # Edge to Aggregation UPF connections
       - A: UPF-Edge1
         B: UPF-Agg1
       - A: UPF-Edge1
@@ -209,59 +210,54 @@ configuration:
       - A: UPF-Edge2
         B: UPF-Agg2
       
-      # Direct Edge to Core connections (for baseline testing)
-      - A: UPF-Edge1
-        B: UPF-Core
-      - A: UPF-Edge2
-        B: UPF-Core
-      
-      # Aggregation to Core connections
       - A: UPF-Agg1
         B: UPF-Core
       - A: UPF-Agg2
         B: UPF-Core
-        
-  ulcl: true  # Enable ULCL for traffic classification
-  ulclRouteInfo:
-    - dnn: urllc
-      routeProfiles:
-        - qfi: 1
-          qos:
-            5qi: 6
-            arp:
-              priorityLevel: 1
-          route:
-            - nodeId: upf-edge1.free5gc.org
-            - nodeId: upf-agg2.free5gc.org
-            - nodeId: upf-core.free5gc.org
-    - dnn: mec
-      routeProfiles:
-        - route:
-            - nodeId: upf-edge1.free5gc.org
-            - nodeId: upf-agg1.free5gc.org
-    - dnn: internet
-      routeProfiles:
-        - route:
-            - nodeId: upf-edge1.free5gc.org
-            - nodeId: upf-core.free5gc.org
-    - dnn: ims
-      routeProfiles:
-        - route:
-            - nodeId: upf-edge1.free5gc.org
-            - nodeId: upf-core.free5gc.org
 
+  ueRoutingInfo:
+    - SUPI: imsi-208930000000003
+      AN: gNB1
+      PathList:
+        - DestinationIP: 0.0.0.0
+          UPF: UPF-Edge1,UPF-Agg1,UPF-Core
+              
+    - SUPI: imsi-208930000000004
+      AN: gNB2
+      PathList:
+        - DestinationIP: 0.0.0.0
+          UPF: UPF-Edge2,UPF-Agg2,UPF-Core
+    
+    - SUPI: imsi-208930000000005
+      AN: gNB1
+      PathList:
+        - DestinationIP: 10.80.0.0/16
+          UPF: UPF-Edge1,UPF-Agg1
+        - DestinationIP: 0.0.0.0
+          UPF: UPF-Edge1,UPF-Agg1,UPF-Core
+    
+    - SUPI: imsi-208930000000006
+      AN: gNB2
+      PathList:
+        - DestinationIP: 10.91.0.0/16
+          UPF: UPF-Edge2,UPF-Agg2
+        - DestinationIP: 0.0.0.0
+          UPF: UPF-Edge2,UPF-Agg2,UPF-Core
+  
   t3591:
     enable: true
-    expireTime: 5s  # Reduced for faster recovery in URLLC
+    expireTime: 5s
     maxRetryTimes: 2
   t3592:
     enable: true
     expireTime: 5s
     maxRetryTimes: 2
+  nrfCertPem: cert/nrf.pem
   urrPeriod: 10
   urrThreshold: 1000
   requestedUnit: 1000
-  
+  ulcl: true
+
 logger:
   enable: true
   level: debug

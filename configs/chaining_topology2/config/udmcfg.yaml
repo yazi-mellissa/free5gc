@@ -11,13 +11,13 @@ configuration:
     - nudm-pp # Nudm_ParameterProvisionDataManagement service
   sbi: # Service-based interface information
     scheme: http # the protocol for sbi (http or https)
-    registerIPv4: udm.free5gc.org # IP used to register to NRF
-    bindingIPv4: udm.free5gc.org  # IP used to bind the service
+    registerIPv4: 172.30.0.17 # IP used to register to NRF
+    bindingIPv4: 172.30.0.17  # IP used to bind the service
     port: 8000 # Port used to bind the service
     tls: # the local path of TLS key
       pem: cert/udm.pem # UDM TLS Certificate
       key: cert/udm.key # UDM TLS Private key
-  nrfUri: http://nrf.free5gc.org:8000 # a valid URI of NRF
+  nrfUri: http://172.30.0.11:8000 # a valid URI of NRF
   nrfCertPem: cert/nrf.pem
   mongodb:
     url: mongodb://mongodb:27017

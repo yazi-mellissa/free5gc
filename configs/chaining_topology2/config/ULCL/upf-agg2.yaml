@@ -2,23 +2,26 @@ version: 1.0.3
 description: UPF-Agg2 initial local configuration
 
 pfcp:
-  addr: upf-agg2.free5gc.org
-  nodeID: upf-agg2.free5gc.org
+  addr: 172.31.0.32  # Adresse dans le réseau d'agrégation
+  nodeID: 172.31.0.32
   retransTimeout: 1s
   maxRetrans: 3
 
 gtpu:
   forwarder: gtp5g
   ifList:
-    - addr: upf-agg2-n9.free5gc.org
+    - addr: 172.31.0.32  # Interface vers UPF-Core
       type: N9
+      name: n9_core
+    - addr: 172.32.0.32  # Interface vers UPF-Edge
+      type: N9
+      name: n9_edge
 
 dnnList:
   - dnn: urllc
     cidr: 10.90.0.0/16
   - dnn: ims
     cidr: 10.91.0.0/16
-    natIfname: eth0
 
 logger:
   enable: true

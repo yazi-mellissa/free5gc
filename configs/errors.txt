@@ -1,0 +1,8 @@
+upf-core exited with code 0
+smf               | 2025-04-27T14:49:40.756440371Z [ERRO][SMF][Main] SMF Run error: ReadConfig [] Error: [Factory] yaml: unmarshal errors:
+smf               |   line 11: cannot unmarshal !!str `UPF-Edge1` into []string
+smf               |   line 20: cannot unmarshal !!str `UPF-Edge2` into []string
+smf               |   line 29: cannot unmarshal !!str `UPF-Edge1` into []string
+smf               |   line 34: cannot unmarshal !!str `UPF-Edge1` into []string
+smf               |   line 43: cannot unmarshal !!str `UPF-Edge2` into []string
+smf               |   line 48: cannot unmarshal !!str `UPF-Edge2` into []string

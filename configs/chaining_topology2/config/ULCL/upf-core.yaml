@@ -2,30 +2,34 @@ version: 1.0.3
 description: UPF-Core initial local configuration
 
 pfcp:
-  addr: upf-core.free5gc.org
-  nodeID: upf-core.free5gc.org
+  addr: 172.30.0.30  # Adresse dans le réseau core
+  nodeID: 172.30.0.30
   retransTimeout: 1s
   maxRetrans: 3
 
 gtpu:
   forwarder: gtp5g
   ifList:
-    - addr: upf-core-n9.free5gc.org
+    - addr: 172.31.0.30  # Interface côté agrégation (N9)
       type: N9
+      name: n9
+    - addr: 172.30.0.30  # Interface côté core (N6/DN)
+      type: DN
+      name: dn
 
 dnnList:
   - dnn: internet
     cidr: 10.100.0.0/16
-    natIfname: eth0
+    natIfName: dn  # Interface pour NAT vers Internet
   - dnn: urllc
     cidr: 10.101.0.0/16
-    natIfname: eth0
+    natIfName: dn
   - dnn: mec
     cidr: 10.102.0.0/16
-    natIfname: eth0
+    natIfName: dn
   - dnn: ims
     cidr: 10.103.0.0/16
-    natIfname: eth0
+    natIfName: dn
 
 logger:
   enable: true

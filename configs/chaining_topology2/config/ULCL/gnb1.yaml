@@ -1,14 +1,19 @@
-mcc: 208
-mnc: 93
+# Add these to your gNB configuration files (both gnb1 and gnb2)
+mcc: 208  # Mobile Country Code
+mnc: 93   # Mobile Network Code
+op: "11111111111111111111111111111111"  # Replace with your actual operator key (hex format)
+integrity: "NIA2"  # Network Integrity Algorithm - NIA2 is commonly used (AES)
+# You may also need to add:
+encryption: "NEA0"  # Network Encryption Algorithm - NEA0 means no encryption
 nci: 0x000000010
 idLength: 32
 tac: 1
 
 amfConfigs:
-  - address: amf.free5gc.org
+  - address: 172.30.0.12
     port: 38412
 
-linkIp: 127.0.0.1
+linkIp: 172.32.0.41
 
 linkConfigs:
   - name: gNB1 to UPF-Edge1
@@ -16,8 +21,8 @@ linkConfigs:
     port: 2152
     type: N3
 
-ngapIp: gnb1.free5gc.org
-gtpIp: gnb1.free5gc.org
+ngapIp: 172.32.0.41
+gtpIp: 172.32.0.41
 
 slices:
   - sst: 1

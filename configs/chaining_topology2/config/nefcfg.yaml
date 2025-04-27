@@ -5,13 +5,13 @@ info:
 configuration:
   sbi:
     scheme: http # The protocol for sbi (http or https)
-    registerIPv4: nef.free5gc.org # IP used to register to NRF
-    bindingIPv4: nef.free5gc.org # IP used to bind the service
+    registerIPv4: 172.30.0.20 # IP used to register to NRF
+    bindingIPv4: 172.30.0.20 # IP used to bind the service
     port: 8000 # port used to bind the service
     tls: # the local path of TLS key
       pem: cert/nef.pem # NEF TLS Certificate
       key: cert/nef.key # NEF TLS Private key
-  nrfUri: http://nrf.free5gc.org:8000 # A valid URI of NRF
+  nrfUri: http://172.30.0.11:8000 # A valid URI of NRF
   nrfCertPem: cert/nrf.pem # NRF Certificate
   mongodb:
     url: mongodb://mongodb:27017
