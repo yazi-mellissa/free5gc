@@ -38,6 +38,8 @@ services:
     container_name: mongodb
     networks:
       core-network:
+        aliases:
+          - mongodb
         ipv4_address: 172.30.0.10
     volumes:
       - mongodbdata:/data/db
@@ -52,6 +54,8 @@ services:
   nrf:
     image: free5gc/nrf:v4.0.0
     container_name: nrf
+    expose: 
+      - "8000"
     depends_on:
       - mongodb
     networks:
@@ -82,6 +86,8 @@ services:
     container_name: ausf
     depends_on:
       - nrf
+    environment:
+      GIN_MODE: release
     networks:
       core-network:
         ipv4_address: 172.30.0.13
@@ -96,6 +102,8 @@ services:
     container_name: nssf
     depends_on:
       - nrf
+    environment:
+      GIN_MODE: release
     networks:
       core-network:
         ipv4_address: 172.30.0.14
@@ -110,6 +118,8 @@ services:
     container_name: pcf
     depends_on:
       - nrf
+    environment:
+      GIN_MODE: release
     networks:
       core-network:
         ipv4_address: 172.30.0.15
@@ -118,13 +128,16 @@ services:
       - ./cert:/free5gc/cert
     command: ["/free5gc/pcf", "-c", "/free5gc/config/pcfcfg.yaml"]
     restart: always
-
-  # SMF doit être connecté aux trois réseaux pour orchestrer les chemins de données
   smf:
     image: free5gc/smf:v4.0.0
     container_name: smf
     depends_on:
       - nrf
+      - upf-edge1
+      - upf-edge2
+      - upf-agg1
+      - upf-agg2
+      - upf-core 
     networks:
       core-network:
         ipv4_address: 172.30.0.16
@@ -144,6 +157,9 @@ services:
     container_name: udm
     depends_on:
       - nrf
+      - mongodb
+    environment:
+      GIN_MODE: release
     networks:
       core-network:
         ipv4_address: 172.30.0.17
@@ -159,9 +175,14 @@ services:
     depends_on:
       - mongodb
       - nrf
+    environment:
+      DB_URI: mongodb://mongodb/free5gc
+      GIN_MODE: release
     networks:
       core-network:
         ipv4_address: 172.30.0.18
+    ports:
+      - "8001:8001"
     volumes:
       - ./config/udrcfg.yaml:/free5gc/config/udrcfg.yaml
       - ./cert:/free5gc/cert
@@ -174,6 +195,10 @@ services:
     depends_on:
       - mongodb
       - nrf
+      - webui
+    environment:
+      DB_URI: mongodb://mongodb/free5gc
+      GIN_MODE: release
     networks:
       core-network:
         ipv4_address: 172.30.0.19
@@ -188,6 +213,9 @@ services:
     container_name: nef
     depends_on:
       - nrf
+      - mongodb
+    environment:
+      GIN_MODE: release
     networks:
       core-network:
         ipv4_address: 172.30.0.20
@@ -312,7 +340,6 @@ services:
     privileged: true
     depends_on:
       - amf
-      - upf-edge1
     networks:
       edge-network:
         ipv4_address: 172.32.0.41
@@ -328,7 +355,6 @@ services:
     privileged: true
     depends_on:
       - amf
-      - upf-edge2
     networks:
       edge-network:
         ipv4_address: 172.32.0.42

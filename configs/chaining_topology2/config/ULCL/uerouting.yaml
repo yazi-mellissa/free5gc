@@ -1,54 +1,101 @@
-version: 1.0.0
-description: Routing information for UE traffic
+info:
+  version: 1.0.7
+  description: Routing information for UE in URLLC multi-UPF chaining
 
-# Format as a map with SUPI as keys
 ueRoutingInfo:
-  imsi-208930000000003:  # UE sur gNB1 - profil standard
-    AN: gNB1
-    PathList:
-      - DestinationIP: 0.0.0.0
-        DestinationPort: ""
-        UPF: 
-          - UPF-Edge1
-          - UPF-Agg1
-          - UPF-Core
+  InternetUsers:
+    members:
+      - imsi-208930000000001
+      - imsi-208930000007487
+    topology:
+      - A: gNB1
+        B: UPF-Edge1
+      - A: UPF-Edge2
+        B: UPF-Core
+      - A: UPF-Edge1
+        B: UPF-Core
+      - A: UPF-Edge2
+        B: UPF-Core
+    specificPath:
+      - dest: 10.100.0.0/16
+        path: [UPF-Edge1, UPF-Core]
+      - dest: 10.100.0.0/16
+        path: [UPF-Edge2, UPF-Core]
 
-  imsi-208930000000004:  # UE sur gNB2 - profil URLLC
-    AN: gNB2
-    PathList:
-      - DestinationIP: 0.0.0.0
-        DestinationPort: ""
-        UPF: 
-          - UPF-Edge2
-          - UPF-Agg2
-          - UPF-Core
+  URLLCUsers:
+    members:
+      - imsi-208930000007486
+    topology:
+      - A: gNB1
+        B: UPF-Edge1
+      - A: gNB2
+        B: UPF-Edge2
+      - A: UPF-Edge1
+        B: UPF-Agg2
+      - A: UPF-Edge2
+        B: UPF-Agg2
+      - A: UPF-Agg2
+        B: UPF-Core
+    specificPath:
+      - dest: 10.101.0.0/16
+        path: [UPF-Edge1, UPF-Agg2, UPF-Core]
+      - dest: 10.101.0.0/16
+        path: [UPF-Edge2, UPF-Agg2, UPF-Core]
 
-  imsi-208930000000005:  # UE sur gNB1 - accès MEC local
-    AN: gNB1
-    PathList:
-      - DestinationIP: 10.80.0.0
-        DestinationPort: ""
-        UPF: 
-          - UPF-Edge1
-          - UPF-Agg1
-      - DestinationIP: 0.0.0.0
-        DestinationPort: ""
-        UPF: 
-          - UPF-Edge1
-          - UPF-Agg1
-          - UPF-Core
+  MECUsers:
+    members:
+      - imsi-208930000007485
+    topology:
+      - A: gNB1
+        B: UPF-Edge1
+      - A: gNB2
+        B: UPF-Edge2
+      - A: UPF-Edge1
+        B: UPF-Agg1
+      - A: UPF-Edge2
+        B: UPF-Agg1
+      - A: UPF-Agg1
+        B: UPF-Core
+    specificPath:
+      - dest: 10.80.0.0/16
+        path: [UPF-Edge1, UPF-Agg1, UPF-Core]
+      - dest: 10.80.0.0/16
+        path: [UPF-Edge2, UPF-Agg1, UPF-Core]
+      - dest: 10.62.0.0/16
+        path: [UPF-Edge1]
+      - dest: 10.72.0.0/16
+        path: [UPF-Edge2]
 
-  imsi-208930000000006:  # UE sur gNB2 - accès IMS
-    AN: gNB2
-    PathList:
-      - DestinationIP: 10.91.0.0
-        DestinationPort: ""
-        UPF: 
-          - UPF-Edge2
-          - UPF-Agg2
-      - DestinationIP: 0.0.0.0
-        DestinationPort: ""
-        UPF: 
-          - UPF-Edge2
-          - UPF-Agg2
-          - UPF-Core
+  IMSUsers:
+    members:
+      - imsi-208930000007484
+    topology:
+      - A: gNB1
+        B: UPF-Edge1
+      - A: gNB2
+        B: UPF-Edge2
+      - A: UPF-Edge1
+        B: UPF-Agg2
+      - A: UPF-Edge2
+        B: UPF-Agg2
+      - A: UPF-Agg2
+        B: UPF-Core
+    specificPath:
+      - dest: 10.103.0.0/16
+        path: [UPF-Edge1, UPF-Agg2, UPF-Core]
+      - dest: 10.103.0.0/16
+        path: [UPF-Edge2, UPF-Agg2, UPF-Core]
+
+routeProfile:
+  URLLC:
+    forwardingPolicyID: 1
+  MEC:
+    forwardingPolicyID: 2
+
+pfdDataForApp:
+  - applicationId: edge
+    pfds:
+      - pfdID: pfd1
+        flowDescriptions:
+          - permit out ip from 10.62.0.0/16 8080 to any
+          - permit out ip from 10.72.0.0/16 8080 to any

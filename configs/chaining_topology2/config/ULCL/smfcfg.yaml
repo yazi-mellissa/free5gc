@@ -210,40 +210,67 @@ configuration:
       - A: UPF-Edge2
         B: UPF-Agg2
       
+      - A: UPF-Edge1
+        B: UPF-Core
+      - A: UPF-Edge2
+        B: UPF-Core
+      
       - A: UPF-Agg1
         B: UPF-Core
       - A: UPF-Agg2
         B: UPF-Core
 
-  ueRoutingInfo:
-    - SUPI: imsi-208930000000003
-      AN: gNB1
-      PathList:
-        - DestinationIP: 0.0.0.0
-          UPF: UPF-Edge1,UPF-Agg1,UPF-Core
-              
-    - SUPI: imsi-208930000000004
-      AN: gNB2
-      PathList:
-        - DestinationIP: 0.0.0.0
-          UPF: UPF-Edge2,UPF-Agg2,UPF-Core
-    
-    - SUPI: imsi-208930000000005
-      AN: gNB1
-      PathList:
-        - DestinationIP: 10.80.0.0/16
-          UPF: UPF-Edge1,UPF-Agg1
-        - DestinationIP: 0.0.0.0
-          UPF: UPF-Edge1,UPF-Agg1,UPF-Core
-    
-    - SUPI: imsi-208930000000006
-      AN: gNB2
-      PathList:
-        - DestinationIP: 10.91.0.0/16
-          UPF: UPF-Edge2,UPF-Agg2
-        - DestinationIP: 0.0.0.0
-          UPF: UPF-Edge2,UPF-Agg2,UPF-Core
-  
+  ulcl: true  # Enable ULCL for traffic classification
+  ulclRouteInfo:
+  - dnn: urllc
+    routeProfiles:
+      - qfi: 1
+        qos:
+          5qi: 6
+          arp:
+            priorityLevel: 1
+        route:
+          - nodeId: UPF-Edge1
+          - nodeId: UPF-Agg2
+          - nodeId: UPF-Core
+      - qfi: 2
+        qos:
+          5qi: 6
+          arp:
+            priorityLevel: 1
+        route:
+          - nodeId: UPF-Edge2
+          - nodeId: UPF-Agg2
+          - nodeId: UPF-Core
+  - dnn: mec
+    routeProfiles:
+      - route:
+          - nodeId: UPF-Edge1
+          - nodeId: UPF-Agg1
+          - nodeId: UPF-Core
+      - route:
+          - nodeId: UPF-Edge2
+          - nodeId: UPF-Agg1
+          - nodeId: UPF-Core
+  - dnn: internet
+    routeProfiles:
+      - route:
+          - nodeId: UPF-Edge1
+          - nodeId: UPF-Core
+      - route:
+          - nodeId: UPF-Edge2
+          - nodeId: UPF-Core
+  - dnn: ims
+    routeProfiles:
+      - route:
+          - nodeId: UPF-Edge1
+          - nodeId: UPF-Agg2
+          - nodeId: UPF-Core
+      - route:
+          - nodeId: UPF-Edge2
+          - nodeId: UPF-Agg2
+          - nodeId: UPF-Core
+
   t3591:
     enable: true
     expireTime: 5s
@@ -256,7 +283,7 @@ configuration:
   urrPeriod: 10
   urrThreshold: 1000
   requestedUnit: 1000
-  ulcl: true
+  
 
 logger:
   enable: true
